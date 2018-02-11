@@ -1,0 +1,5 @@
+---
+- name: Clean temp dir
+  file:
+    path: '{{ tempdir.path }}'
+    state: absent

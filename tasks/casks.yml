@@ -1,0 +1,14 @@
+---
+- name: Download cask
+  command: "{{ homebrew_brew_bin_path }}/brew cask fetch {{ cask }}"
+
+- name: Refresh sudo credential cache
+  shell: "sudo -S -v <<< '{{ ansible_become_pass }}'"
+  args:
+    warn: no
+
+- name: Install configured cask applications.
+  homebrew_cask:
+    name: "{{ cask }}"
+    state: present
+    install_options: "appdir={{ homebrew_cask_appdir }}"

@@ -17,6 +17,8 @@ platforms:
     cpus: 4
 provisioner:
   name: ansible
+  options:
+    vvv: True
   playbooks:
     create: create.yml
     converge: ../../tests/test.yml
@@ -24,8 +26,13 @@ provisioner:
   config_options:
     defaults:
       callback_whitelist: profile_tasks,timer
+      # pipelining: True
   lint:
     name: ansible-lint
+  inventory:
+    host_vars:
+      sierra:
+        ansible_become_pass: vagrant
 scenario:
   name: default
 verifier:

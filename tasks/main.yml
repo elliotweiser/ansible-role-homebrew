@@ -104,12 +104,35 @@
   with_items: "{{ homebrew_taps }}"
 
 # Cask.
+#- include_tasks: casks.yml
+#  with_items: '{{ homebrew_cask_apps }}'
+#  loop_control:
+#    loop_var: cask
+- name: create temporary build directory
+  tempfile:
+    state: directory
+    suffix: ansible-homebrew-cask
+  register: tempdir
+  notify:
+    - Clean temp dir
+
+- name: Set the askpass script
+  copy:
+    content: |
+      #!/bin/sh
+      cat <<< '{{ ansible_become_pass }}'
+    dest: '{{ tempdir.path }}/askpass.sh'
+    mode: 0700
+  no_log: true
+
 - name: Install configured cask applications.
   homebrew_cask:
     name: "{{ item }}"
     state: present
     install_options: "appdir={{ homebrew_cask_appdir }}"
-  with_items: "{{ homebrew_cask_apps }}"
+  with_items: '{{ homebrew_cask_apps }}'
+  environment:
+    SUDO_ASKPASS: '{{ tempdir.path }}/askpass.sh'
 
 - name: Ensure blacklisted cask applications are not installed.
   homebrew_cask: "name={{ item }} state=absent"

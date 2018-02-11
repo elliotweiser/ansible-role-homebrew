@@ -1,6 +1,22 @@
 ---
 - name: Converge
   hosts: all
+  #vars_prompt:
+  # - name: ansible_become_pass
+  #   prompt: "Please enter your SUDO password"
+  #   private: yes
+  pre_tasks:
+    - name: Disable password-less sudo
+      replace:
+        dest: /etc/sudoers
+        regexp: ^(vagrant\s+ALL=\(ALL\)\s+NOPASSWD:\s+ALL)$
+        replace: '# \1'
+      become: yes
   roles:
-    - elliotweiser.osx-command-line-tools
-    - ansible-role-homebrew
+    - role: elliotweiser.osx-command-line-tools
+    - role: ansible-role-homebrew
+      homebrew_installed_packages:
+        - maven
+      homebrew_cask_apps:
+        - java
+
